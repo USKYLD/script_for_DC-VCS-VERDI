@@ -1,0 +1,131 @@
+set do_scan	    0
+
+# set CMP_OPTION "-no_autoungroup -scan"
+if {$do_scan == 1} { 
+    set CMP_OPTION [format "%s %s" -no_autoungroup -scan]
+} else {
+    set CMP_OPTION [format "%s" -no_autoungroup]
+}
+set compile_cmd  "compile $CMP_OPTION"
+alias do_compile $compile_cmd
+alias do_compile_inc $compile_cmd -inc
+
+echo "======================================"
+set NUM v0.1
+echo "code version : $NUM"
+echo "======================================"
+echo "set your project work path"
+set SYN_ROOT_PATH .
+echo "$SYN_ROOT_PATH"
+echo "======================================"
+echo "set your rtl document path"
+set RTL_PATH $SYN_ROOT_PATH/rtl/$NUM
+echo "$RTL_PATH"
+echo "======================================"
+echo "set your config document path"
+set CONFIG_PATH $SYN_ROOT_PATH/config
+echo "$CONFIG_PATH"
+echo "======================================"
+echo "set your scripts document path"
+set SCRIPT_PATH $SYN_ROOT_PATH/scripts
+echo "$SCRIPT_PATH"
+echo "======================================"
+echo "set your unmapped document path"
+set UNMAPPED_PATH $SYN_ROOT_PATH/unmapped/$NUM
+echo "$UNMAPPED_PATH"
+echo "======================================"
+echo "set your mapped document path"
+set MAPPED_PATH $SYN_ROOT_PATH/mapped/$NUM
+echo "$MAPPED_PATH"
+echo "======================================"
+echo "set your report document path"
+set REPORT_PATH $SYN_ROOT_PATH/report/$NUM
+echo "$REPORT_PATH"
+echo "======================================"
+echo "set your work document path"
+set WORK_PATH $SYN_ROOT_PATH/work
+echo "$WORK_PATH"
+echo "======================================"
+#set your DC software path 
+echo "set your DC software path"
+set DC_PATH  /usr/synopsys/dc-L-2016.03-SP1/
+echo "$DC_PATH"
+
+#  Additional Setup Files
+source ./$SCRIPT_PATH/file_create.tcl
+
+
+sh mv ./*.v $RTL_PATH
+sh find $RTL_PATH -name "*.v" > $RTL_PATH/flist.f
+echo "====Define your library directory===="
+
+#Maps a design library to a UNIX directory. This directory is used to store intermediate representations of designs.
+define_design_lib work -path $WORK_PATH
+set cache_write  $WORK_PATH
+set cache_read   $WORK_PATH
+echo "======================================"
+echo "set your symbol library"
+#set SYMBOL_PATH /root/szr/
+set SYMBOL_PATH /root/library/tsmc18/Std_lib/fb_tsmc-cl018g_sc-x_2004q3v1/aci/sc/symbols/synopsys
+echo "$SYMBOL_PATH"
+echo "======================================"
+echo "set your lib path"
+#set LIB_PATH /root/szr
+set LIB_PATH /root/library/tsmc18/Std_lib/fb_tsmc-cl018g_sc-x_2004q3v1/aci/sc/synopsys
+echo "$LIB_PATH"
+echo "======================================"
+#echo "*library path automatic search settings*"
+
+set_app_var search_path [list  . $search_path \
+                                 $LIB_PATH \
+				 $SYMBOL_PATH \
+	   			 $RTL_PATH \
+				 $SCRIPT_PATH \
+				 ${DC_PATH}/libraries/syn \
+								]
+#echo "$search_path"
+# This virables are automatically set if you perform ultra command.
+# Specify for use during optimization
+# You do not need to be anything to access the standard library.
+# DC is setup to use this lirary by default
+echo "======================================"
+echo "****DC own library path*********"
+set_app_var synthetic_library [list dw_foundation.sldb standard.sldb]
+echo "$synthetic_library"
+echo "======================================"
+echo "***Target library name *********"
+set_app_var target_library [list slow.db ]
+echo "$target_library"
+echo "======================================"
+echo "***Link library name************"
+set_app_var link_library [list "*" ${target_library}]
+echo "$link_library"
+echo "======================================"
+echo "***Symbol Library name**********"						 
+set_app_var symbol_library [list tsmc18.sdb]
+echo "$symbol_library"
+
+
+
+#  History
+history keep 200
+
+#  Aliases
+alias h history
+alias rc "report_constraint -all_violators"
+alias rt report_timing
+alias ra report_area
+alias rq report_qor
+alias page_on {set sh_enable_page_mode true}
+alias page_off {set sh_enable_page_mode false}
+alias fr "remove_design -designs"
+
+
+
+#Source the naming rules
+
+ echo "***************End of Load .synopsys_dc.setup********"
+
+
+
+
