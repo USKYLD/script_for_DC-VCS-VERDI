@@ -1,0 +1,1 @@
+These scripts are examples for Synopsys DC, VCS, and VERDI. They can be used for VCS simulation of Verilog code, waveform viewing with VERDI, and synthesis with DC. Additionally, there are example scripts for simulation after back-annotated delay post-synthesis.
